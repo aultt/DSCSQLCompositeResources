@@ -54,7 +54,7 @@ Param(
         $FailoverMode ='Automatic'
         )
 
-    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.1.0.0
+    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
     foreach ($AG in $AvailabilityGroupName)
     {
         xWaitForAvailabilityGroup $AG
