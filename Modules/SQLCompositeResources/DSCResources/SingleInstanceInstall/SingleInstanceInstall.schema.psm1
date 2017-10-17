@@ -157,7 +157,7 @@ Configuration SingleInstanceInstall {
     
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
-    Import-DscResource -ModuleName SQLCompositeResources -ModuleVersion 1.0
+    Import-DscResource -ModuleName SQLCompositeResources
     
     WindowsFeature 'NetFramework45'
     {

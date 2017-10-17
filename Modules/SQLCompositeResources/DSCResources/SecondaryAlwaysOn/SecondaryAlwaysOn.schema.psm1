@@ -172,7 +172,7 @@ Param(  [Parameter(Mandatory = $true)]
 )
 
     Import-DscResource -ModuleName xFailovercluster -ModuleVersion 1.8.0.0
-    Import-DscResource -ModuleName SQLCompositeResources -ModuleVersion 1.0
+    Import-DscResource -ModuleName SQLCompositeResources
 
     SingleInstanceInstall Standalone 
     { 
