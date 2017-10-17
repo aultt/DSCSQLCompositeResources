@@ -26,6 +26,14 @@ Configuration PrimaryAlwaysOn {
         $SetupSourcePath,
         
         [ValidateNotNullorEmpty()]
+        [bool]
+        $UpdateEnabled = $False,
+        
+        [ValidateNotNullorEmpty()]
+        [bool]
+        $ForceReboot = $False,
+        
+        [ValidateNotNullorEmpty()]
         [string]
         $Features ='SQLENGINE',
         
@@ -45,7 +53,6 @@ Configuration PrimaryAlwaysOn {
         [ValidateNotNullorEmpty()]
         [string]
         $InstallSharedWOWDir = 'C:\Program Files (x86)\Microsoft SQL Server',
-
 
         [ValidateNotNullorEmpty()]
         [string]
@@ -107,7 +114,60 @@ Configuration PrimaryAlwaysOn {
         [ValidateNotNullorEmpty()]
         [System.Management.Automation.PSCredential]
         [System.Management.Automation.Credential()]
-        $SqlAgentServiceCredential = $SqlServiceCredential
+        $SqlAgentServiceCredential = $SqlServiceCredential,
+        
+        [ValidateNotNullorEmpty()]
+        [string]
+        $VirtualMemoryInitialSize = 4096,
+        
+        [ValidateNotNullorEmpty()]
+        [string]
+        $VirtualMemoryMaximumSize = 4096,
+        
+        [ValidateNotNullorEmpty()]
+        [string]
+        $VirtualMemoryDrive = 'C',
+        
+        [ValidateNotNullorEmpty()]
+        [string]
+        $XpCmdShellEnabled = 0,
+
+        [ValidateNotNullorEmpty()]
+        [string]
+        $OptimizeAdhocWorkloads = 0,
+
+        [ValidateNotNullorEmpty()]
+        [string]
+        $CrossDBOwnershipChaining = 0,
+
+        [ValidateNotNullorEmpty()]
+        [string]
+        $IsSqlClrEnabled = 0,
+        
+        [ValidateNotNullorEmpty()]
+        [string]
+        $AgentXPsEnabled = 1,
+
+        [ValidateNotNullorEmpty()]
+        [string]
+        $DatabaseMailEnabled = 0,
+
+        [ValidateNotNullorEmpty()]
+        [string]
+        $OleAutomationProceduresEnabled = 0,
+        
+        [ValidateNotNullorEmpty()]
+        [string]
+        $DefaultBackupCompression = 1,
+
+        [ValidateNotNullorEmpty()]
+        [string]
+        $RemoteDacConnectionsEnabled = 0,
+
+        [ValidateNotNullorEmpty()]
+        [string]
+        $AdHocDistributedQueriesEnabled = 0
+
     )
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName SQLCompositeResources -ModuleVersion 1.0
@@ -116,11 +176,40 @@ Configuration PrimaryAlwaysOn {
     SingleInstanceInstall Standalone 
     { 
         Server = $Server
+        SQLInstance = $SQLInstance
         SetupSourcePath = $SetupSourcePath
+        UpdateEnabled = $UpdateEnabled
+        ForceReboot = $ForceReboot
+        Features = $Features
         SQLSysAdminAccounts = $SQLSysAdminAccounts
+        SQLCollation = $SQLCollation
+        InstallSharedDir = $InstallSharedDir
+        InstallSharedWOWDir = $InstallSharedWOWDir
+        InstanceDir = $InstanceDir
+        InstallSQLDataDir = $InstallSQLDataDir
+        SQLUserDBDir = $SQLUserDBDir
+        SQLUserDBLogDir = $SQLUserDBLogDir
+        SQLTempDBDir = $SQLTempDBDir
+        SQLTempDBLogDir = $SQLTempDBLogDir
+        SQLBackupDir = $SQLBackupDir
+        SQLPort = $SQLPort
         SqlInstallCredential = $SqlInstallCredential
         SqlServiceCredential = $SqlServiceCredential
         SqlAgentServiceCredential = $SqlAgentServiceCredential
+        VirtualMemoryInitialSize = $VirtualMemoryInitialSize
+        VirtualMemoryMaximumSize = $VirtualMemoryMaximumSize
+        VirtualMemoryDrive = $VirtualMemoryDrive
+        XpCmdShellEnabled = $XpCmdShellEnabled
+        OptimizeAdhocWorkloads= $OptimizeAdhocWorkloads
+        CrossDBOwnershipChaining = $CrossDBOwnershipChaining
+        IsSqlClrEnabled = $IsSqlClrEnabled
+        AgentXPsEnabled = $AgentXPsEnabled
+        DatabaseMailEnabled = $DatabaseMailEnabled
+        OleAutomationProceduresEnabled = $OleAutomationProceduresEnabled
+        DefaultBackupCompression = $DefaultBackupCompression
+        RemoteDacConnectionsEnabled = $RemoteDacConnectionsEnabled
+        AdHocDistributedQueriesEnabled = $AdHocDistributedQueriesEnabled
+
     } 
 
     WindowsClusterInstall PrimaryNode
