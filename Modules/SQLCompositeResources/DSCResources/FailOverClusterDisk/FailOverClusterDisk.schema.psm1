@@ -10,7 +10,7 @@ Import-DscResource -ModuleName xFailoverCluster -ModuleVersion 1.8.0.0
 
     foreach ($Disk in $DiskConfiguration)
     {
-        xClusterDisk 'AddDataDisk'
+        xClusterDisk $Disk.Label
         {
             Number = $Disk.Number
             Ensure = 'Present'
