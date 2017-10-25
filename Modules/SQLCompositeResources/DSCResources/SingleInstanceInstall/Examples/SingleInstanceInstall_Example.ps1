@@ -52,7 +52,7 @@ Set-DscLocalConfigurationManager $ConfigData.AllNodes.nodename -Path $MofPath -F
 #region SQL Config
 Configuration SQLStandAlone
 {
-    Import-DscResource -ModuleName SQLCompositeResources -ModuleVersion 1.0
+    Import-DscResource -ModuleName SQLCompositeResources 
 
     node $allNodes.nodename
     {

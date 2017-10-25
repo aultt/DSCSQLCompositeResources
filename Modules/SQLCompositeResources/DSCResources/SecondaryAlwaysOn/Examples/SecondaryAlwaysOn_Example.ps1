@@ -61,7 +61,7 @@ foreach ($node in $ConfigData.AllNodes.nodename)
 Configuration SecondaryAlwaysOnConfig
 {
     Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName SQLCompositeResources -ModuleVersion 1.0
+    Import-DscResource -ModuleName SQLCompositeResources 
 
     node $allNodes.nodename
     {
