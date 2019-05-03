@@ -57,8 +57,8 @@ param
     )
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName SQLCompositeResources
-    Import-DscResource -ModuleName xFailoverCluster -ModuleVersion 1.8.0.0
-    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
+    Import-DscResource -ModuleName xFailoverCluster
+    Import-DscResource -ModuleName SqlServerDsc
 
     WindowsClusterInstall AdditionalNode
     {
@@ -88,7 +88,7 @@ param
         Ensure = 'Present'
     }
 
-    xSQLServerSetup FCISQLAdditionalNode
+    SqlSetup FCISQLAdditionalNode
     {
         Action                     = 'AddNode'
         ForceReboot                = $ForceReboot

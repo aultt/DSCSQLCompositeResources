@@ -1,5 +1,5 @@
 Configuration FailOverClusterInstanceFirstNode {
-param
+    param
     (   
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -30,7 +30,7 @@ param
         
         [ValidateNotNullorEmpty()]
         [string]
-        $Features ='SQLENGINE',
+        $Features = 'SQLENGINE',
         
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -39,7 +39,7 @@ param
 
         [ValidateNotNullorEmpty()]
         [string]
-        $SQLCollation ='SQL_Latin1_General_CP1_CI_AS',
+        $SQLCollation = 'SQL_Latin1_General_CP1_CI_AS',
 
         [ValidateNotNullorEmpty()]
         [string]
@@ -51,7 +51,7 @@ param
 
         [ValidateNotNullorEmpty()]
         [string]
-        $InstanceDir ='C:\Program Files\Microsoft SQL Server',
+        $InstanceDir = 'C:\Program Files\Microsoft SQL Server',
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -186,42 +186,37 @@ param
         [ValidateNotNullorEmpty()]
         [string]
         $AdHocDistributedQueriesEnabled = 0
-  )
+    )
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName SQLCompositeResources
-    Import-DscResource -ModuleName xFailoverCluster -ModuleVersion 1.8.0.0
-    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
+    Import-DscResource -ModuleName xFailoverCluster
+    Import-DscResource -ModuleName SqlServerDsc
 
-    WindowsClusterInstall FCINode1
-    {
+    WindowsClusterInstall FCINode1 {
         Ensure = 'Present'
     }
     
-    xcluster FCICluster
-    {
-        Name = $ClusterName 
+    xCluster FCICluster {
+        Name                          = $ClusterName 
         DomainAdministratorCredential = $DomainAdministratorCred
-        StaticIPAddress = $ClusterIP
+        StaticIPAddress               = $ClusterIP
     
-        DependsOn = '[WindowsClusterInstall]FCINode1'
+        DependsOn                     = '[WindowsClusterInstall]FCINode1'
     }
     
-    FailOverClusterDisk SetupDisks
-    {
+    FailOverClusterDisk SetupDisks {
         DiskConfiguration = $DiskConfiguration
 
-        DependsOn = '[xcluster]FCICluster'
+        DependsOn         = '[xCluster]FCICluster'
     }
 
 
-    WindowsFeature 'NetFramework45'
-    {
+    WindowsFeature 'NetFramework45' {
         Name   = 'NET-Framework-45-Core'
         Ensure = 'Present'
     }
     
-    xSQLServerSetup FCISQLNode1
-    {
+    SqlSetup FCISQLNode1 {
         Action                     = 'InstallFailoverCluster'
         ForceReboot                = $ForceReboot
         UpdateEnabled              = $UpdateEnabled
@@ -256,25 +251,24 @@ param
         DependsOn                  = '[WindowsFeature]NetFramework45', '[FailOverClusterDisk]SetupDisks'
     }
 
-    SQLConfiguration 'ConfigureSQLInstall'
-    {
-        Server = $FailoverClusterNetworkName
-        SQLInstance = $SQLInstance
-        SQLPort = $SQLPort
-        VirtualMemoryInitialSize = $VirtualMemoryInitialSize
-        VirtualMemoryMaximumSize = $VirtualMemoryMaximumSize
-        VirtualMemoryDrive = $VirtualMemoryDrive
-        XpCmdShellEnabled = $XpCmdShellEnabled
-        OptimizeAdhocWorkloads= $OptimizeAdhocWorkloads
-        CrossDBOwnershipChaining = $CrossDBOwnershipChaining
-        IsSqlClrEnabled = $IsSqlClrEnabled
-        AgentXPsEnabled = $AgentXPsEnabled
-        DatabaseMailEnabled = $DatabaseMailEnabled
+    SQLConfiguration 'ConfigureSQLInstall' {
+        Server                         = $FailoverClusterNetworkName
+        SQLInstance                    = $SQLInstance
+        SQLPort                        = $SQLPort
+        VirtualMemoryInitialSize       = $VirtualMemoryInitialSize
+        VirtualMemoryMaximumSize       = $VirtualMemoryMaximumSize
+        VirtualMemoryDrive             = $VirtualMemoryDrive
+        XpCmdShellEnabled              = $XpCmdShellEnabled
+        OptimizeAdhocWorkloads         = $OptimizeAdhocWorkloads
+        CrossDBOwnershipChaining       = $CrossDBOwnershipChaining
+        IsSqlClrEnabled                = $IsSqlClrEnabled
+        AgentXPsEnabled                = $AgentXPsEnabled
+        DatabaseMailEnabled            = $DatabaseMailEnabled
         OleAutomationProceduresEnabled = $OleAutomationProceduresEnabled
-        DefaultBackupCompression = $DefaultBackupCompression
-        RemoteDacConnectionsEnabled = $RemoteDacConnectionsEnabled
+        DefaultBackupCompression       = $DefaultBackupCompression
+        RemoteDacConnectionsEnabled    = $RemoteDacConnectionsEnabled
         AdHocDistributedQueriesEnabled = $AdHocDistributedQueriesEnabled
 
-        DependsOn            = '[xSQLServerSetup]FCISQLNode1'
+        DependsOn                      = '[SqlSetup]FCISQLNode1'
     }
 }

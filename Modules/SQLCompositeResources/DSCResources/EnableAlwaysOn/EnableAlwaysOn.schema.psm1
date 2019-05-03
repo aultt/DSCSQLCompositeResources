@@ -1,5 +1,5 @@
 Configuration EnableAlwaysOn {
-Param(  
+    Param(  
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [string]
@@ -17,32 +17,30 @@ Param(
         
         [ValidateNotNullorEmpty()]
         [string]
-        $HADRPort =5022,
+        $HADRPort = 5022,
         
         [ValidateNotNullorEmpty()]
         [string]
         $RestartTimeout = 120
-)
+    )
 
-    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
+    Import-DscResource -ModuleName SqlServerDsc
     
     # Adding the required service account to allow the cluster to log into SQL
-    xSQLServerLogin AddNTServiceClusSvc
-    {
+    SqlServerLogin AddNTServiceClusSvc {
         Ensure               = 'Present'
         Name                 = 'NT SERVICE\ClusSvc'
         LoginType            = 'WindowsUser'
-        SQLServer            = $Server
-        SQLInstanceName      = $SQLInstance
+        ServerName           = = $Server
+        InstanceName         = $SQLInstance
         PsDscRunAsCredential = $SqlInstallCredential
     }
 
     # Add the required permissions to the cluster service login
-    xSQLServerPermission AddNTServiceClusSvcPermissions
-    {
-        DependsOn            = '[xSQLServerLogin]AddNTServiceClusSvc'
+    SqlServerPermission AddNTServiceClusSvcPermissions {
+        DependsOn            = '[SqlServerLogin]AddNTServiceClusSvc'
         Ensure               = 'Present'
-        NodeName             = $Server
+        ServerName           = = $Server
         InstanceName         = $SQLInstance
         Principal            = 'NT SERVICE\ClusSvc'
         Permission           = 'AlterAnyAvailabilityGroup', 'ViewServerState'
@@ -50,48 +48,43 @@ Param(
     }
 
     # Create a DatabaseMirroring endpoint
-    xSQLServerEndpoint HADREndpoint
-    {
+    SqlServerEndpoint HADREndpoint {
         EndPointName         = 'HADR'
         Ensure               = 'Present'
         Port                 = $HADRPort
-        SQLServer            = $Server
-        SQLInstanceName      = $SQLInstance
+        ServerName           = = $Server
+        InstanceName         = $SQLInstance
         PsDscRunAsCredential = $SqlInstallCredential
     }
     
-    xSQLServerLogin AddSQLServiceAccount
-    {
+    SqlServerLogin AddSQLServiceAccount {
         Ensure               = 'Present'
         Name                 = $SqlServiceCredential.UserName
         LoginType            = 'WindowsUser'
-        SQLServer            = $Server
-        SQLInstanceName      = $SQLInstance
+        ServerName           = = $Server
+        InstanceName         = $SQLInstance
         PsDscRunAsCredential = $SqlInstallCredential
     }
 
-    xSQLServerEndpointPermission SQLConfigureEndpointPermission
-    {
+    SqlServerEndpointPermission SQLConfigureEndpointPermission {
         Ensure               = 'Present'
-        NodeName             = $Server
+        ServerName           = = $Server
         InstanceName         = $SQLInstance
         Name                 = 'HADR'
         Principal            = $SqlServiceCredential.UserName
         Permission           = 'CONNECT'
     
         PsDscRunAsCredential = $SqlInstallCredential
-        DependsOn = '[xSQLServerEndpoint]HADREndpoint','[xSQLServerLogin]AddSQLServiceAccount'
+        DependsOn            = '[SqlServerEndpoint]HADREndpoint', '[SqlServerLogin]AddSQLServiceAccount'
     }
     
-    xSQLServerAlwaysOnService 'EnableAlwaysOn'
-    {
+    SqlAlwaysOnService 'EnableAlwaysOn' {
         Ensure               = 'Present'
-        SQLServer            = $Server
-        SQLInstanceName      = $SQLInstance
+        ServerName           = $Server
+        InstanceName         = $SQLInstance
         RestartTimeout       = $RestartTimeout
 
         PsDscRunAsCredential = $SqlInstallCredential
     }
-
 
 }

@@ -1,5 +1,5 @@
 Configuration AvailabilityGroupJoin {
-Param(  
+    Param(  
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [string]
@@ -43,7 +43,7 @@ Param(
 
         [ValidateNotNullorEmpty()]
         [String]
-        $ConnectionModeInPrimaryRole= 'AllowAllConnections',
+        $ConnectionModeInPrimaryRole = 'AllowAllConnections',
 
         [ValidateNotNullorEmpty()]
         [String]
@@ -51,14 +51,13 @@ Param(
 
         [ValidateNotNullorEmpty()]
         [String]
-        $FailoverMode ='Automatic'
-        )
+        $FailoverMode = 'Automatic'
+    )
 
-    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
-    foreach ($AG in $AvailabilityGroupName)
-    {
-        xWaitForAvailabilityGroup $AG
-        {
+    Import-DscResource -ModuleName SqlServerDsc
+    
+    foreach ($AG in $AvailabilityGroupName) {
+        SqlWaitForAG $AG {
             Name                 = $AG
             RetryIntervalSec     = $AvailabilityGroupRetryIntervalSec 
             RetryCount           = $AvailabilityGroupRetryCount
@@ -66,24 +65,22 @@ Param(
             PsDscRunAsCredential = $SqlInstallCredential
         }
         
-        
-        xSQLServerAlwaysOnAvailabilityGroupReplica $AG
-            {
-                Ensure                        = 'Present'
-                Name                          = $Server
-                AvailabilityGroupName         = $AG
-                SQLServer                     = $Server
-                SQLInstanceName               = $SQLInstance
-                PrimaryReplicaSQLServer       = $PrimaryReplica
-                PrimaryReplicaSQLInstanceName = $SQLInstance
-                AvailabilityMode              = $AvailabilityMode             
-                BackupPriority                = $BackupPriority               
-                ConnectionModeInPrimaryRole   = $ConnectionModeInPrimaryRole  
-                ConnectionModeInSecondaryRole = $ConnectionModeInSecondaryRole
-                FailoverMode                  = $FailoverMode                 
+        SqlAGReplica $AG {
+            Ensure                        = 'Present'
+            Name                          = $Server
+            AvailabilityGroupName         = $AG
+            ServerName                    = = $Server
+            InstanceName                  = $SQLInstance
+            PrimaryReplicaServerName      = = $PrimaryReplica
+            PrimaryReplicaInstanceName    = = $SQLInstance
+            AvailabilityMode              = $AvailabilityMode             
+            BackupPriority                = $BackupPriority               
+            ConnectionModeInPrimaryRole   = $ConnectionModeInPrimaryRole  
+            ConnectionModeInSecondaryRole = $ConnectionModeInSecondaryRole
+            FailoverMode                  = $FailoverMode                 
                 
-                PsDscRunAsCredential = $SqlInstallCredential
-                DependsOn = "[xWaitForAvailabilityGroup]$AG"           
-            }
+            PsDscRunAsCredential          = $SqlInstallCredential
+            DependsOn                     = "[SqlWaitForAG]$AG"           
         }
     }
+}
