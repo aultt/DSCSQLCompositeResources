@@ -1,5 +1,5 @@
 Configuration SecondaryAlwaysOn {
-Param(  [Parameter(Mandatory = $true)]
+    Param(  [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [string]
         $Server,
@@ -41,7 +41,7 @@ Param(  [Parameter(Mandatory = $true)]
         
         [ValidateNotNullorEmpty()]
         [string]
-        $Features ='SQLENGINE',
+        $Features = 'SQLENGINE',
         
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -50,7 +50,7 @@ Param(  [Parameter(Mandatory = $true)]
 
         [ValidateNotNullorEmpty()]
         [string]
-        $SQLCollation ='SQL_Latin1_General_CP1_CI_AS',
+        $SQLCollation = 'SQL_Latin1_General_CP1_CI_AS',
 
         [ValidateNotNullorEmpty()]
         [string]
@@ -60,15 +60,13 @@ Param(  [Parameter(Mandatory = $true)]
         [string]
         $InstallSharedWOWDir = 'C:\Program Files (x86)\Microsoft SQL Server',
 
-
         [ValidateNotNullorEmpty()]
         [string]
-        $InstanceDir ='C:\Program Files\Microsoft SQL Server',
+        $InstanceDir = 'C:\Program Files\Microsoft SQL Server',
 
         [ValidateNotNullorEmpty()]
         [string]
         $InstallSQLDataDir = 'C:\Program Files\Microsoft SQL Server\MSSQL.MSSQLSERVER\MSSQL\Data',
-
 
         [ValidateNotNullorEmpty()]
         [string]
@@ -169,78 +167,73 @@ Param(  [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [string]
         $AdHocDistributedQueriesEnabled = 0
-)
+    )
 
-    Import-DscResource -ModuleName xFailovercluster -ModuleVersion 1.8.0.0
+    Import-DscResource -ModuleName xFailovercluster
     Import-DscResource -ModuleName SQLCompositeResources
 
-    SingleInstanceInstall Standalone 
-    { 
-        Server = $Server
-        SQLInstance = $SQLInstance
-        SetupSourcePath = $SetupSourcePath
-        UpdateEnabled = $UpdateEnabled
-        ForceReboot = $ForceReboot
-        Features = $Features
-        SQLSysAdminAccounts = $SQLSysAdminAccounts
-        SQLCollation = $SQLCollation
-        InstallSharedDir = $InstallSharedDir
-        InstallSharedWOWDir = $InstallSharedWOWDir
-        InstanceDir = $InstanceDir
-        InstallSQLDataDir = $InstallSQLDataDir
-        SQLUserDBDir = $SQLUserDBDir
-        SQLUserDBLogDir = $SQLUserDBLogDir
-        SQLTempDBDir = $SQLTempDBDir
-        SQLTempDBLogDir = $SQLTempDBLogDir
-        SQLBackupDir = $SQLBackupDir
-        SQLPort = $SQLPort
-        SqlInstallCredential = $SqlInstallCredential
-        SqlServiceCredential = $SqlServiceCredential
-        SqlAgentServiceCredential = $SqlAgentServiceCredential
-        VirtualMemoryInitialSize = $VirtualMemoryInitialSize
-        VirtualMemoryMaximumSize = $VirtualMemoryMaximumSize
-        VirtualMemoryDrive = $VirtualMemoryDrive
-        XpCmdShellEnabled = $XpCmdShellEnabled
-        OptimizeAdhocWorkloads= $OptimizeAdhocWorkloads
-        CrossDBOwnershipChaining = $CrossDBOwnershipChaining
-        IsSqlClrEnabled = $IsSqlClrEnabled
-        AgentXPsEnabled = $AgentXPsEnabled
-        DatabaseMailEnabled = $DatabaseMailEnabled
+    SingleInstanceInstall Standalone { 
+        Server                         = $Server
+        SQLInstance                    = $SQLInstance
+        SetupSourcePath                = $SetupSourcePath
+        UpdateEnabled                  = $UpdateEnabled
+        ForceReboot                    = $ForceReboot
+        Features                       = $Features
+        SQLSysAdminAccounts            = $SQLSysAdminAccounts
+        SQLCollation                   = $SQLCollation
+        InstallSharedDir               = $InstallSharedDir
+        InstallSharedWOWDir            = $InstallSharedWOWDir
+        InstanceDir                    = $InstanceDir
+        InstallSQLDataDir              = $InstallSQLDataDir
+        SQLUserDBDir                   = $SQLUserDBDir
+        SQLUserDBLogDir                = $SQLUserDBLogDir
+        SQLTempDBDir                   = $SQLTempDBDir
+        SQLTempDBLogDir                = $SQLTempDBLogDir
+        SQLBackupDir                   = $SQLBackupDir
+        SQLPort                        = $SQLPort
+        SqlInstallCredential           = $SqlInstallCredential
+        SqlServiceCredential           = $SqlServiceCredential
+        SqlAgentServiceCredential      = $SqlAgentServiceCredential
+        VirtualMemoryInitialSize       = $VirtualMemoryInitialSize
+        VirtualMemoryMaximumSize       = $VirtualMemoryMaximumSize
+        VirtualMemoryDrive             = $VirtualMemoryDrive
+        XpCmdShellEnabled              = $XpCmdShellEnabled
+        OptimizeAdhocWorkloads         = $OptimizeAdhocWorkloads
+        CrossDBOwnershipChaining       = $CrossDBOwnershipChaining
+        IsSqlClrEnabled                = $IsSqlClrEnabled
+        AgentXPsEnabled                = $AgentXPsEnabled
+        DatabaseMailEnabled            = $DatabaseMailEnabled
         OleAutomationProceduresEnabled = $OleAutomationProceduresEnabled
-        DefaultBackupCompression = $DefaultBackupCompression
-        RemoteDacConnectionsEnabled = $RemoteDacConnectionsEnabled
+        DefaultBackupCompression       = $DefaultBackupCompression
+        RemoteDacConnectionsEnabled    = $RemoteDacConnectionsEnabled
         AdHocDistributedQueriesEnabled = $AdHocDistributedQueriesEnabled
     } 
     
-    WindowsClusterInstall SecondaryNode
-    {
-        Ensure = 'Present'
+    WindowsClusterInstall SecondaryNode {
+        Ensure    = 'Present'
         DependsOn = '[SingleInstanceInstall]Standalone'
     }
     
-    xWaitForCluster WaitForMyCluster
-    {
-        Name = $ClusterName
-        RetryIntervalSec = $ClusterWaitRetryInterval
-        RetryCount = $ClusterWaitRetryCount
-        PsDscRunAsCredential  = $SqlInstallCredential
-        DependsOn = '[WindowsClusterInstall]SecondaryNode'
+    xWaitForCluster WaitForMyCluster {
+        Name                 = $ClusterName
+        RetryIntervalSec     = $ClusterWaitRetryInterval
+        RetryCount           = $ClusterWaitRetryCount
+        PsDscRunAsCredential = $SqlInstallCredential
+        DependsOn            = '[WindowsClusterInstall]SecondaryNode'
     }
     
-    xCluster JoinNodeToCluster
-    {
+    xCluster JoinNodeToCluster {
         Name                          = $ClusterName 
         StaticIPAddress               = $ClusterIP
         DomainAdministratorCredential = $SqlInstallCredential
         DependsOn                     = '[xWaitForCluster]WaitForMyCluster'
     }
     
-    EnableAlwaysOn EnableSecondary
-    {
-        Server = $Server
+    EnableAlwaysOn EnableSecondary {
+        Server               = $Server
         SqlInstallCredential = $SqlInstallCredential
     
-        DependsOn = '[WindowsClusterInstall]SecondaryNode','[SingleInstanceInstall]Standalone'
+        DependsOn            = '[WindowsClusterInstall]SecondaryNode', '[SingleInstanceInstall]Standalone'
     }
 
 }

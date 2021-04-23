@@ -35,7 +35,7 @@ Configuration PrimaryAlwaysOn {
         
         [ValidateNotNullorEmpty()]
         [string]
-        $Features ='SQLENGINE',
+        $Features = 'SQLENGINE',
         
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -44,7 +44,7 @@ Configuration PrimaryAlwaysOn {
 
         [ValidateNotNullorEmpty()]
         [string]
-        $SQLCollation ='SQL_Latin1_General_CP1_CI_AS',
+        $SQLCollation = 'SQL_Latin1_General_CP1_CI_AS',
 
         [ValidateNotNullorEmpty()]
         [string]
@@ -56,7 +56,7 @@ Configuration PrimaryAlwaysOn {
 
         [ValidateNotNullorEmpty()]
         [string]
-        $InstanceDir ='C:\Program Files\Microsoft SQL Server',
+        $InstanceDir = 'C:\Program Files\Microsoft SQL Server',
 
         [ValidateNotNullorEmpty()]
         [string]
@@ -171,66 +171,62 @@ Configuration PrimaryAlwaysOn {
     )
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName SQLCompositeResources
-    Import-DscResource -ModuleName xFailoverCluster -ModuleVersion 1.8.0.0
+    Import-DscResource -ModuleName xFailoverCluster
 
-    SingleInstanceInstall Standalone 
-    { 
-        Server = $Server
-        SQLInstance = $SQLInstance
-        SetupSourcePath = $SetupSourcePath
-        UpdateEnabled = $UpdateEnabled
-        ForceReboot = $ForceReboot
-        Features = $Features
-        SQLSysAdminAccounts = $SQLSysAdminAccounts
-        SQLCollation = $SQLCollation
-        InstallSharedDir = $InstallSharedDir
-        InstallSharedWOWDir = $InstallSharedWOWDir
-        InstanceDir = $InstanceDir
-        InstallSQLDataDir = $InstallSQLDataDir
-        SQLUserDBDir = $SQLUserDBDir
-        SQLUserDBLogDir = $SQLUserDBLogDir
-        SQLTempDBDir = $SQLTempDBDir
-        SQLTempDBLogDir = $SQLTempDBLogDir
-        SQLBackupDir = $SQLBackupDir
-        SQLPort = $SQLPort
-        SqlInstallCredential = $SqlInstallCredential
-        SqlServiceCredential = $SqlServiceCredential
-        SqlAgentServiceCredential = $SqlAgentServiceCredential
-        VirtualMemoryInitialSize = $VirtualMemoryInitialSize
-        VirtualMemoryMaximumSize = $VirtualMemoryMaximumSize
-        VirtualMemoryDrive = $VirtualMemoryDrive
-        XpCmdShellEnabled = $XpCmdShellEnabled
-        OptimizeAdhocWorkloads= $OptimizeAdhocWorkloads
-        CrossDBOwnershipChaining = $CrossDBOwnershipChaining
-        IsSqlClrEnabled = $IsSqlClrEnabled
-        AgentXPsEnabled = $AgentXPsEnabled
-        DatabaseMailEnabled = $DatabaseMailEnabled
+    SingleInstanceInstall Standalone { 
+        Server                         = $Server
+        SQLInstance                    = $SQLInstance
+        SetupSourcePath                = $SetupSourcePath
+        UpdateEnabled                  = $UpdateEnabled
+        ForceReboot                    = $ForceReboot
+        Features                       = $Features
+        SQLSysAdminAccounts            = $SQLSysAdminAccounts
+        SQLCollation                   = $SQLCollation
+        InstallSharedDir               = $InstallSharedDir
+        InstallSharedWOWDir            = $InstallSharedWOWDir
+        InstanceDir                    = $InstanceDir
+        InstallSQLDataDir              = $InstallSQLDataDir
+        SQLUserDBDir                   = $SQLUserDBDir
+        SQLUserDBLogDir                = $SQLUserDBLogDir
+        SQLTempDBDir                   = $SQLTempDBDir
+        SQLTempDBLogDir                = $SQLTempDBLogDir
+        SQLBackupDir                   = $SQLBackupDir
+        SQLPort                        = $SQLPort
+        SqlInstallCredential           = $SqlInstallCredential
+        SqlServiceCredential           = $SqlServiceCredential
+        SqlAgentServiceCredential      = $SqlAgentServiceCredential
+        VirtualMemoryInitialSize       = $VirtualMemoryInitialSize
+        VirtualMemoryMaximumSize       = $VirtualMemoryMaximumSize
+        VirtualMemoryDrive             = $VirtualMemoryDrive
+        XpCmdShellEnabled              = $XpCmdShellEnabled
+        OptimizeAdhocWorkloads         = $OptimizeAdhocWorkloads
+        CrossDBOwnershipChaining       = $CrossDBOwnershipChaining
+        IsSqlClrEnabled                = $IsSqlClrEnabled
+        AgentXPsEnabled                = $AgentXPsEnabled
+        DatabaseMailEnabled            = $DatabaseMailEnabled
         OleAutomationProceduresEnabled = $OleAutomationProceduresEnabled
-        DefaultBackupCompression = $DefaultBackupCompression
-        RemoteDacConnectionsEnabled = $RemoteDacConnectionsEnabled
+        DefaultBackupCompression       = $DefaultBackupCompression
+        RemoteDacConnectionsEnabled    = $RemoteDacConnectionsEnabled
         AdHocDistributedQueriesEnabled = $AdHocDistributedQueriesEnabled
 
     } 
 
-    WindowsClusterInstall PrimaryNode
-    {
+    WindowsClusterInstall PrimaryNode {
         Ensure = 'Present'
     }
 
-    xcluster AlwaysOnClust
-    {
-        Name = $ClusterName 
+    xCluster AlwaysOnClust {
+        Name                          = $ClusterName 
         DomainAdministratorCredential = $DomainAdministratorCred
-        StaticIPAddress = $ClusterIP
+        StaticIPAddress               = $ClusterIP
     
-        DependsOn = "[WindowsClusterInstall]PrimaryNode"
+        DependsOn                     = "[WindowsClusterInstall]PrimaryNode"
     }
 
-    EnableAlwaysOn EnablePrimary
-    {
-        Server = $Server
+    EnableAlwaysOn EnablePrimary {
+        Server               = $Server
         SqlInstallCredential = $SqlInstallCredential
 
-        DependsOn = '[WindowsClusterInstall]PrimaryNode','[xcluster]AlwaysOnClust'
+        DependsOn            = '[WindowsClusterInstall]PrimaryNode', '[Cluster]AlwaysOnClust'
     }
 }

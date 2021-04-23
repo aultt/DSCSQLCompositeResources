@@ -1,5 +1,6 @@
 Configuration SQLConfiguration {
-Param(  [Parameter(Mandatory = $true)]
+    Param(
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [string]
         $Server,
@@ -63,135 +64,119 @@ Param(  [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [string]
         $AdHocDistributedQueriesEnabled = 0
-        )
+    )
 
-    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
-    Import-DscResource -ModuleName xComputerManagement -ModuleVersion 2.1.0.0  
+    Import-DscResource -ModuleName SQLServerDsc
+    Import-DscResource -ModuleName ComputerManagementDsc
     
-    xPowerPlan SetPlanHighPerformance
-    {
-        IsSingleInstance = 'yes'
-        Name = "High Performance"
+    PowerPlan SetPlanHighPerformance {
+        IsSingleInstance = 'Yes'
+        Name             = "High Performance"
     }
 
-    xVirtualMemory SetVirtualMem
-    {
-         Drive = $VirtualMemoryDrive
-         Type = 'CustomSize'
-         InitialSize = $VirtualMemoryInitialSize
-         MaximumSize = $VirtualMemoryMaximumSize
+    VirtualMemory SetVirtualMem {
+        Drive       = $VirtualMemoryDrive
+        Type        = 'CustomSize'
+        InitialSize = $VirtualMemoryInitialSize
+        MaximumSize = $VirtualMemoryMaximumSize
     }
-    xSQLServerMemory 'SetSQLMemory'
-    {
-        SQLInstanceName = $SQLInstance
+    SqlServerMemory 'SetSQLMemory' {
+        InstanceName = $SQLInstance
         DynamicAlloc = $true
-        Ensure = 'Present'
+        Ensure       = 'Present'
     }
 
-    xSQLServerMaxDop 'SetMaxXop'
-    {
-        SQLInstanceName = $SQLInstance
+    SqlServerMaxDop 'SetMaxXop' {
+        InstanceName = $SQLInstance
         DynamicAlloc = $true
-        Ensure = 'Present'
+        Ensure       = 'Present'
     }
 
-    xSQLServerNetwork 'ConfigNetwork'
-    {
-       InstanceName = $SQLInstance
-       ProtocolName = 'TCP'
-       IsEnabled = $true
-       TcpPort = $SQLPort
-       RestartService = $true
+    SqlServerNetwork 'ConfigNetwork' {
+        InstanceName   = $SQLInstance
+        ProtocolName   = 'TCP'
+        IsEnabled      = $true
+        TcpPort        = $SQLPort
+        RestartService = $true
     }
 
-    xSQLServerConfiguration 'XPCmdShellEnabled'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "xp_cmdshell" 
-        OptionValue = $XpCmdShellEnabled
+    SqlServerConfiguration 'XPCmdShellEnabled' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "xp_cmdshell" 
+        OptionValue    = $XpCmdShellEnabled
         RestartService = $false
     }
 
-
-    xSQLServerConfiguration 'AgentXPsEnabled'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "Agent XPs" 
-        OptionValue = $AgentXPsEnabled
+    SqlServerConfiguration 'AgentXPsEnabled' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "Agent XPs" 
+        OptionValue    = $AgentXPsEnabled
         RestartService = $false
     }
 
-    xSQLServerConfiguration 'DatabaseMailEnabled'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "Database Mail XPs" 
-        OptionValue = $DatabaseMailEnabled
+    SqlServerConfiguration 'DatabaseMailEnabled' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "Database Mail XPs" 
+        OptionValue    = $DatabaseMailEnabled
         RestartService = $false
     }
 
-    xSQLServerConfiguration 'OptimizeAdhocWorkloads' 
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "optimize for ad hoc workloads" 
-        OptionValue = $OptimizeAdhocWorkloads
+    SqlServerConfiguration 'OptimizeAdhocWorkloads' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "optimize for ad hoc workloads" 
+        OptionValue    = $OptimizeAdhocWorkloads
         RestartService = $false
     }
 
-    xSQLServerConfiguration 'CrossDBOwnershipChaining'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "cross db ownership chaining" 
-        OptionValue = $CrossDBOwnershipChaining
+    SqlServerConfiguration 'CrossDBOwnershipChaining' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "cross db ownership chaining" 
+        OptionValue    = $CrossDBOwnershipChaining
         RestartService = $false
     }
 
-    xSQLServerConfiguration 'IsSqlClrEnabled'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "clr enabled" 
-        OptionValue = $IsSqlClrEnabled
+    SqlServerConfiguration 'IsSqlClrEnabled' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "clr enabled" 
+        OptionValue    = $IsSqlClrEnabled
         RestartService = $false
     }
 
-    xSQLServerConfiguration 'OleAutomationProceduresEnabled'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "Ole Automation Procedures" 
-        OptionValue = $OleAutomationProceduresEnabled
+    SqlServerConfiguration 'OleAutomationProceduresEnabled' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "Ole Automation Procedures" 
+        OptionValue    = $OleAutomationProceduresEnabled
         RestartService = $false
     }
 
-    xSQLServerConfiguration 'DefaultBackupCompression'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "backup compression default" 
-        OptionValue = $DefaultBackupCompression
+    SqlServerConfiguration 'DefaultBackupCompression' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "backup compression default" 
+        OptionValue    = $DefaultBackupCompression
         RestartService = $false
     }
 
-    xSQLServerConfiguration 'RemoteDacConnectionsEnabled'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "remote admin connections" 
-        OptionValue = $RemoteDacConnectionsEnabled
+    SqlServerConfiguration 'RemoteDacConnectionsEnabled' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "remote admin connections" 
+        OptionValue    = $RemoteDacConnectionsEnabled
         RestartService = $false
     }
 
-    xSQLServerConfiguration 'AdHocDistributedQueriesEnabled'
-    {
-        SQLServer = $Server
-        SQLInstanceName = $SQLInstance
-        OptionName = "Ad Hoc Distributed Queries" 
-        OptionValue = $AdHocDistributedQueriesEnabled
+    SqlServerConfiguration 'AdHocDistributedQueriesEnabled' {
+        ServerName     = $Server
+        InstanceName   = $SQLInstance
+        OptionName     = "Ad Hoc Distributed Queries" 
+        OptionValue    = $AdHocDistributedQueriesEnabled
         RestartService = $false
     }
 

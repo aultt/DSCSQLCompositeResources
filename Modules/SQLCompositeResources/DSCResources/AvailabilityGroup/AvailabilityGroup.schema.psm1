@@ -1,5 +1,5 @@
 Configuration AvailabilityGroup {
-Param(  
+    Param(  
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [string]
@@ -34,7 +34,7 @@ Param(
 
         [ValidateNotNullorEmpty()]
         [String]
-        $ConnectionModeInPrimaryRole= 'AllowAllConnections',
+        $ConnectionModeInPrimaryRole = 'AllowAllConnections',
 
         [ValidateNotNullorEmpty()]
         [String]
@@ -42,7 +42,7 @@ Param(
 
         [ValidateNotNullorEmpty()]
         [String]
-        $FailoverMode ='Automatic',
+        $FailoverMode = 'Automatic',
 
         [ValidateNotNullorEmpty()]
         [int16]
@@ -53,33 +53,32 @@ Param(
         
         [bool]
         $DtcSupportEnabled = $true
-        )
+    )
 
-    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
-    foreach ($AG in $AvailabilityGroupName)
-    {
-        xSQLServerAlwaysOnAvailabilityGroup $AG
-            {
-                Ensure                        = 'Present'
-                Name                          = $AG
-                SQLInstanceName               = $SQLInstance
-                SQLServer                     = $Server
+    Import-DscResource -ModuleName SqlServerDsc
+    
+    foreach ($AG in $AvailabilityGroupName) {
+        SqlAG $AG {
+            Ensure                        = 'Present'
+            Name                          = $AG
+            InstanceName                  = $SQLInstance
+            ServerName                    = $Server
                 
-                AutomatedBackupPreference     = $AutomatedBackupPreference    
-                AvailabilityMode              = $AvailabilityMode             
-                BackupPriority                = $BackupPriority               
-                ConnectionModeInPrimaryRole   = $ConnectionModeInPrimaryRole  
-                ConnectionModeInSecondaryRole = $ConnectionModeInSecondaryRole
-                FailoverMode                  = $FailoverMode                 
-                HealthCheckTimeout            = $HealthCheckTimeout           
+            AutomatedBackupPreference     = $AutomatedBackupPreference    
+            AvailabilityMode              = $AvailabilityMode             
+            BackupPriority                = $BackupPriority               
+            ConnectionModeInPrimaryRole   = $ConnectionModeInPrimaryRole  
+            ConnectionModeInSecondaryRole = $ConnectionModeInSecondaryRole
+            FailoverMode                  = $FailoverMode                 
+            HealthCheckTimeout            = $HealthCheckTimeout           
                 
-                # sql server 2016 or later only
-                #BasicAvailabilityGroup        = $Node.BasicAvailabilityGroup
-                DatabaseHealthTrigger         = $DatabaseHealthTrigger
-                DtcSupportEnabled             = $DtcSupportEnabled    
+            # sql server 2016 or later only
+            #BasicAvailabilityGroup        = $Node.BasicAvailabilityGroup
+            DatabaseHealthTrigger         = $DatabaseHealthTrigger
+            DtcSupportEnabled             = $DtcSupportEnabled    
             
-                #DependsOn                     = '[xSQLServerEndpoint]HADREndpoint', '[xSQLServerPermission]AddNTServiceClusSvcPermissions','[xSQLServerAlwaysOnService]EnableAlwaysOn'
-                PsDscRunAsCredential          = $SqlInstallCredential
-            }
+            #DependsOn                     = '[xSQLServerEndpoint]HADREndpoint', '[xSQLServerPermission]AddNTServiceClusSvcPermissions','[xSQLServerAlwaysOnService]EnableAlwaysOn'
+            PsDscRunAsCredential          = $SqlInstallCredential
         }
     }
+}

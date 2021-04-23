@@ -25,7 +25,7 @@ Configuration SingleInstanceInstall {
         
         [ValidateNotNullorEmpty()]
         [string]
-        $Features ='SQLENGINE',
+        $Features = 'SQLENGINE',
         
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -34,7 +34,7 @@ Configuration SingleInstanceInstall {
 
         [ValidateNotNullorEmpty()]
         [string]
-        $SQLCollation ='SQL_Latin1_General_CP1_CI_AS',
+        $SQLCollation = 'SQL_Latin1_General_CP1_CI_AS',
 
         [ValidateNotNullorEmpty()]
         [string]
@@ -47,7 +47,7 @@ Configuration SingleInstanceInstall {
 
         [ValidateNotNullorEmpty()]
         [string]
-        $InstanceDir ='C:\Program Files\Microsoft SQL Server',
+        $InstanceDir = 'C:\Program Files\Microsoft SQL Server',
 
         [ValidateNotNullorEmpty()]
         [string]
@@ -156,17 +156,15 @@ Configuration SingleInstanceInstall {
     )
     
     Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName xSQLServer -ModuleVersion 8.2.0.0
+    Import-DscResource -ModuleName SqlServerDsc
     Import-DscResource -ModuleName SQLCompositeResources
     
-    WindowsFeature 'NetFramework45'
-    {
+    WindowsFeature 'NetFramework45' {
         Name   = 'NET-Framework-45-Core'
         Ensure = 'Present'
     }
     
-    xSQLServerSetup 'SQLInstall'
-    {
+    SqlSetup 'SQLInstall' {
         InstanceName         = $SQLInstance
         Features             = $Features
         SQLCollation         = $SQLCollation
@@ -192,27 +190,25 @@ Configuration SingleInstanceInstall {
         DependsOn            = '[WindowsFeature]NetFramework45'
     }
 
-    SQLConfiguration 'ConfigureSQLInstall'
-    {
-        Server = $Server
-        SQLInstance = $SQLInstance
-        SQLPort = $SQLPort
-        VirtualMemoryInitialSize = $VirtualMemoryInitialSize
-        VirtualMemoryMaximumSize = $VirtualMemoryMaximumSize
-        VirtualMemoryDrive = $VirtualMemoryDrive
-        XpCmdShellEnabled = $XpCmdShellEnabled
-        OptimizeAdhocWorkloads= $OptimizeAdhocWorkloads
-        CrossDBOwnershipChaining = $CrossDBOwnershipChaining
-        IsSqlClrEnabled = $IsSqlClrEnabled
-        AgentXPsEnabled = $AgentXPsEnabled
-        DatabaseMailEnabled = $DatabaseMailEnabled
+    SQLConfiguration 'ConfigureSQLInstall' {
+        Server                         = $Server
+        SQLInstance                    = $SQLInstance
+        SQLPort                        = $SQLPort
+        VirtualMemoryInitialSize       = $VirtualMemoryInitialSize
+        VirtualMemoryMaximumSize       = $VirtualMemoryMaximumSize
+        VirtualMemoryDrive             = $VirtualMemoryDrive
+        XpCmdShellEnabled              = $XpCmdShellEnabled
+        OptimizeAdhocWorkloads         = $OptimizeAdhocWorkloads
+        CrossDBOwnershipChaining       = $CrossDBOwnershipChaining
+        IsSqlClrEnabled                = $IsSqlClrEnabled
+        AgentXPsEnabled                = $AgentXPsEnabled
+        DatabaseMailEnabled            = $DatabaseMailEnabled
         OleAutomationProceduresEnabled = $OleAutomationProceduresEnabled
-        DefaultBackupCompression = $DefaultBackupCompression
-        RemoteDacConnectionsEnabled = $RemoteDacConnectionsEnabled
+        DefaultBackupCompression       = $DefaultBackupCompression
+        RemoteDacConnectionsEnabled    = $RemoteDacConnectionsEnabled
         AdHocDistributedQueriesEnabled = $AdHocDistributedQueriesEnabled
     
-        DependsOn            = '[xSQLServerSetup]SQLInstall'
+        DependsOn                      = '[SqlSetup]SQLInstall'
     }
-
 
 }
